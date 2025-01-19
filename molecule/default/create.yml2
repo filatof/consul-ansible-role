@@ -1,0 +1,62 @@
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    api_host: "192.168.1.10"
+    api_user: "root@pam"
+    api_password: "tiruvanantapu1977"
+    molecule_platforms:
+      - name: test01
+        template_name: ubuntu-molecule
+        ssh_user: fill
+        ssh_identity_file: /Users/fill/.ssh/id_ed25519
+        ipconfig:
+          ipconfig0: 'ip=192.168.1.30/24,gw=192.168.1.1'
+        nameservers:
+          - 192.168.1.1
+
+  tasks:
+    - name: Debugging the variables
+      debug:
+        msg:
+          - "api_host: {{ api_host }}"
+          - "api_user: {{ api_user }}"
+          - "api_password: {{ api_password }}"
+
+    - name: Validate required variables
+      fail:
+        msg: "Required variable '{{ item }}' is missing or undefined."
+      loop:
+        - api_host
+        - api_user
+        - api_password
+      when: item is not defined
+
+    - name: Create instance configs
+      block:
+        - name: Populate instance config dict
+          ansible.builtin.set_fact:
+            instance_conf_dict:
+              instance: "{{ item.name }}"
+              name: "{{ item.name }}"
+              template_name: "{{ item.template_name }}"
+              ssh_user: "{{ item.ssh_user }}"
+              ssh_identity_file: "{{ item.ssh_identity_file }}"
+              ipconfig0: "{{ item.ipconfig.ipconfig0 }}"
+              nameservers: "{{ item.nameservers }}"
+          with_items: "{{ molecule_platforms }}"
+          register: instance_config_dict
+
+        - name: Convert instance config dict to a list
+          ansible.builtin.set_fact:
+            instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+
+        - name: Dump instance config
+          ansible.builtin.copy:
+            content: |
+              # Molecule managed
+
+              {{ instance_conf | to_json | from_json | to_yaml }}
+            dest: "{{ molecule_instance_config }}"
+            mode: "0600"

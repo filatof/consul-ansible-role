@@ -1,0 +1,28 @@
+---
+- name: Download consul release archive to tmp dir
+  ansible.builtin.get_url:
+    url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}.zip"
+    dest: "/tmp/consul_{{ consul_version }}_linux_{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}.zip"
+    mode: 0644
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
+
+- name: Unarchive prometheus binaries
+  ansible.builtin.unarchive:
+    src: "/tmp/consul_{{ consul_version }}_linux_{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}.zip"
+    dest: "/tmp"
+    creates: "/tmp/consul_{{ consul_version }}_linux_{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}/consul"
+    remote_src: yes
+  check_mode: false
+
+- name: Copy consul binaries
+  ansible.builtin.copy:
+    src: "/tmp/consul"
+    dest: "/usr/bin/"
+    mode: 0755
+    owner: root
+    group: root
+    remote_src: yes

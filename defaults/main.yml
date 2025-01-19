@@ -1,0 +1,5 @@
+---
+consul_version: "1.20.2"
+
+consul_config_dir: /var/lib/consul
+consul_data_dir: /etc/consul.d

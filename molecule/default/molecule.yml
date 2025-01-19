@@ -1,0 +1,31 @@
+driver:
+  name: molecule-proxmox
+  options:
+    proxmox_secrets: /Users/fill/proxmox_secrets.yml
+    node: pimox2
+    ssh_user: fill
+    ssh_identity_file: /Users/fill/.ssh/id_ed25519
+platforms:
+  - name: test1
+    newid: 3015
+    template_name: molecule
+    ipconfig:
+      ipconfig0: 'ip=192.168.1.40/24,gw=192.168.1.1'
+    nameservers:
+      - 192.169.1.1
+
+#  - name: test2
+#    newid: 3016
+#    template_name: molecule
+#    ipconfig:
+#      ipconfig0: 'ip=192.168.1.31/24,gw=192.168.1.1'
+#    nameservers:
+#      - 192.169.1.1
+#
+#  - name: test3
+#    newid: 3017
+#    template_name: molecule
+#    ipconfig:
+#      ipconfig0: 'ip=192.168.1.32/24,gw=192.168.1.1'
+#    nameservers:
+#      - 192.169.1.1

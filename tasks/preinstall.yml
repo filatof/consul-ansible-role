@@ -1,0 +1,8 @@
+- name: Ensure unzip is installed
+  ansible.builtin.package:
+    name:
+      - unzip
+      - wget
+      - chrony
+    state: present
+
