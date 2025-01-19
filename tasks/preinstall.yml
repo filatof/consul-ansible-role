@@ -6,3 +6,7 @@
       - chrony
     state: present
 
+- name: Set timezone to Europe/Moscow
+  become: true
+  community.general.timezone:
+    name: Europe/Moscow
